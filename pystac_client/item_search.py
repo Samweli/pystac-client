@@ -733,6 +733,20 @@ class ItemSearch:
                 call_modifier(self.modifier, page)
                 yield page
 
+    def page(self, page=None, token=None) -> Dict:
+        if isinstance(self._stac_io, StacApiIO):
+            page = self._stac_io.get_page(
+                self.url,
+                self.method,
+                self.get_parameters(),
+                page=page,
+                token=token,
+            )
+            page_collection = ItemCollection.from_dict(
+                page, preserve_dict=False, root=self.client
+            ) if page is not None else None
+            return page_collection
+
     # ------------------------------------------------------------------------
     # Everything
 

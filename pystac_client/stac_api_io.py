@@ -263,6 +263,45 @@ class StacApiIO(DefaultStacIO):
                 (link for link in page.get("links", []) if link["rel"] == "next"), None
             )
 
+    def get_page(
+            self,
+            url: str,
+            method: Optional[str] = None,
+            parameters: Optional[Dict[str, Any]] = None,
+            page: Optional = None,
+            token: Optional = None
+    ):
+        """Get page using the passed page number or the token
+
+        Return:
+            Dict[str, Any] : JSON content from a single page
+        """
+        if page is None and token is None:
+            # Always return the first page if page is not passed
+            parameters['page'] = 1
+            page = self.read_json(
+                url,
+                method=method,
+                parameters=parameters
+            )
+        if page is not None:
+            parameters['page'] = page
+            page = self.read_json(
+                url,
+                method=method,
+                parameters=parameters
+            )
+        elif token is not None:
+            parameters['token'] = token
+            page = self.read_json(
+                url,
+                method=method,
+                parameters=parameters
+            )
+        else:
+           page = None
+        return page
+
     def assert_conforms_to(self, conformance_class: ConformanceClasses) -> None:
         """Raises a :exc:`NotImplementedError` if the API does not publish the given
         conformance class. This method only checks against the ``"conformsTo"``
